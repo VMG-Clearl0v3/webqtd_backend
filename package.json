@@ -42,5 +42,10 @@
   "strapi": {
     "uuid": "af5b4c80-64f2-4151-aa98-e3b8cd6a965f",
     "installId": "a6a339171a20dcc7a6b941f27c2fe14446c3b8b3a54e826d2f9dddb211b2f59c"
-  }
+  },
+  "scripts": {
+    "build": "strapi build",
+    "start": "NODE_ENV=production strapi start",
+    "develop": "strapi develop"
+  },
 }
