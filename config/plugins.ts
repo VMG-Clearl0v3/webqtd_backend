@@ -1,4 +1,4 @@
-module.exports = ({ env }) => ({
+export default ({ env }) => ({
   upload: {
     config: {
       provider: '@strapi/provider-upload-cloudinary',
@@ -13,4 +13,10 @@ module.exports = ({ env }) => ({
       },
     },
   },
+  'users-permissions': {
+    config: {
+      jwtSecret: env('JWT_SECRET', 'fallbackSecret'),
+    },
+  },
+
 });
