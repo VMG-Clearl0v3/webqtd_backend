@@ -27,15 +27,21 @@
     "slug": {
       "type": "uid"
     },
-    "description": {
-      "type": "blocks"
-    },
     "type": {
       "type": "enumeration",
       "enum": [
         "loan",
         "deposit"
       ]
+    },
+    "condition": {
+      "type": "text"
+    },
+    "feature": {
+      "type": "text"
+    },
+    "document": {
+      "type": "text"
     }
   }
 }
