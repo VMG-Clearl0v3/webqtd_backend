@@ -12,11 +12,13 @@
   "pluginOptions": {},
   "attributes": {
     "title": {
-      "type": "string"
+      "type": "string",
+      "required": true
     },
     "image": {
       "type": "media",
       "multiple": false,
+      "required": true,
       "allowedTypes": [
         "images",
         "files",
@@ -25,10 +27,12 @@
       ]
     },
     "slug": {
-      "type": "uid"
+      "type": "uid",
+      "required": true
     },
     "type": {
       "type": "enumeration",
+      "required": true,
       "enum": [
         "loan",
         "deposit"
