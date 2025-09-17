@@ -2,8 +2,15 @@ export default [
   'strapi::logger',
   'strapi::errors',
   'strapi::security',
-  'strapi::cors',
-  'strapi::poweredBy',
+ {
+    name: 'strapi::cors',
+    config: {
+      enabled: true,
+      origin: [
+        'https://webqtd.vercel.app', // Frontend
+      ],
+    },
+  },  'strapi::poweredBy',
   'strapi::query',
   'strapi::body',
   'strapi::session',
