@@ -5,12 +5,11 @@ export default [
  {
     name: 'strapi::cors',
     config: {
-      enabled: true,
-      origin: [
-        'https://webqtd.vercel.app', // Frontend
-      ],
+      origin: ['https://webqtd.vercel.app'],
+      methods: ['GET', 'POST', 'PUT', 'DELETE'],
     },
-  },  'strapi::poweredBy',
+  },
+  'strapi::poweredBy',
   'strapi::query',
   'strapi::body',
   'strapi::session',
