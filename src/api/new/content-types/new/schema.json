@@ -17,6 +17,7 @@
     },
     "slug": {
       "type": "uid",
+      "targetField": "title",
       "required": true
     },
     "image": {
@@ -37,6 +38,12 @@
     "date": {
       "type": "datetime",
       "required": true
+    },
+    "category": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::category.category",
+      "inversedBy": "news"
     }
   }
 }
