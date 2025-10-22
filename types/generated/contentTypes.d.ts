@@ -545,7 +545,7 @@ export interface ApiNewNew extends Struct.CollectionTypeSchema {
     singularName: 'new';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
   };
   attributes: {
     category: Schema.Attribute.Relation<'manyToOne', 'api::category.category'>;
@@ -579,7 +579,7 @@ export interface ApiProductProduct extends Struct.CollectionTypeSchema {
     singularName: 'product';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
   };
   attributes: {
     condition: Schema.Attribute.Text;
