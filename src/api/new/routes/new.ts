@@ -19,11 +19,13 @@ export default {
       handler: "new.findOne",
       config: { auth: false },
     },
-    {
-      method: "GET",
-      path: "/news-latest",
-      handler: "new.latest",
-      config: { auth: false },
+  {
+      method: 'GET',
+      path: '/news/latest',
+      handler: 'new.latest',
+      config: {
+        auth: false, // cho phép truy cập public
+      },
     },
     {
       method: "GET",

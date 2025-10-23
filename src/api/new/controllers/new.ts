@@ -56,17 +56,20 @@ export default factories.createCoreController("api::new.new", ({ strapi }) => ({
   },
 
   // ✅ Tin mới nhất
-  async latest(ctx) {
-    const data = await strapi.db.query("api::new.new").findMany({
-      orderBy: { date: "desc" },
-      limit: 5,
-      populate: {
-        category: { select: ["id", "name", "slug"] },
-        image: true,
-      },
-    });
-    return { data };
-  },
+async latest(ctx) {
+  const limit = Number(ctx.query.limit) || 3;
+
+  const data = await strapi.db.query("api::new.new").findMany({
+    orderBy: { date: "desc" },
+    limit,
+    populate: {
+      category: { select: ["id", "name", "slug"] },
+      image: true,
+    },
+  });
+
+  return { data };
+}
 
   // ✅ Tin liên quan
   async related(ctx) {
