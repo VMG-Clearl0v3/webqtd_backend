@@ -1,71 +1,94 @@
-import { factories } from '@strapi/strapi';
+import { factories } from "@strapi/strapi";
 
-export default factories.createCoreController('api::new.new', ({ strapi }) => ({
+export default factories.createCoreController("api::new.new", ({ strapi }) => ({
+
+  // ✅ Danh sách tin tức (có phân trang)
   async find(ctx) {
-    // ép populate về đúng object (Strapi yêu cầu kiểu object, không phải array)
-    ctx.query = {
-      ...ctx.query,
-      populate: {
-        category: true,
-        image: true,
+    const query = ctx.request.query;
+
+    const page = Number(query.page) || 1;
+    const pageSize = Number(query.pageSize) || 10;
+    const start = (page - 1) * pageSize;
+
+    const [data, total] = await Promise.all([
+      strapi.db.query("api::new.new").findMany({
+        where: query.filters || {},
+        orderBy: { date: "desc" },
+        offset: start,
+        limit: pageSize,
+        populate: {
+          category: { select: ["id", "name", "slug"] },
+          image: true,
+        },
+      }),
+      strapi.db.query("api::new.new").count({ where: query.filters || {} }),
+    ]);
+
+    return {
+      data,
+      meta: {
+        pagination: {
+          page,
+          pageSize,
+          pageCount: Math.ceil(total / pageSize),
+          total,
+        },
       },
     };
-
-    // ✅ Gọi hàm gốc, Strapi tự lo pagination + meta + filtering
-    const response = await super.find(ctx);
-
-    return response; // { data, meta }
   },
 
+  // ✅ Lấy 1 tin cụ thể
   async findOne(ctx) {
-    ctx.query = {
-      ...ctx.query,
+    const { id } = ctx.params;
+    const data = await strapi.db.query("api::new.new").findOne({
+      where: { id: Number(id) },
       populate: {
-        category: true,
+        category: { select: ["id", "name", "slug"] },
         image: true,
       },
-    };
+    });
 
-    const response = await super.findOne(ctx);
-    return response; // { data }
+    if (!data) {
+      return ctx.notFound("Không tìm thấy tin tức");
+    }
+
+    return { data };
+  },
+
+  // ✅ Tin mới nhất
+  async latest(ctx) {
+    const data = await strapi.db.query("api::new.new").findMany({
+      orderBy: { date: "desc" },
+      limit: 5,
+      populate: {
+        category: { select: ["id", "name", "slug"] },
+        image: true,
+      },
+    });
+    return { data };
+  },
+
+  // ✅ Tin liên quan
+  async related(ctx) {
+    const { categoryId, excludeId } = ctx.request.query;
+
+    if (!categoryId) {
+      return ctx.badRequest("Thiếu categoryId");
+    }
+
+    const data = await strapi.db.query("api::new.new").findMany({
+      where: {
+        category: Number(categoryId),
+        id: { $ne: Number(excludeId) || 0 },
+      },
+      orderBy: { date: "desc" },
+      limit: 4,
+      populate: {
+        category: { select: ["id", "name", "slug"] },
+        image: true,
+      },
+    });
+
+    return { data };
   },
 }));
-// import { factories } from "@strapi/strapi";
-
-// export default factories.createCoreController("api::new.new", ({ strapi }) => ({
-
-//   // 📄 Lấy danh sách tin (có category, image, meta, pagination)
-//   async find(ctx) {
-//     const { query } = ctx;
-
-//     // Sử dụng entityService.findPage() để có pagination & meta tự động
-//     const result = await strapi.entityService.findPage("api::new.new", {
-//       ...query,
-//       populate: {
-//         category: true,
-//         image: true,
-//       },
-//       sort: { date: "desc" },
-//     });
-
-//     return result; // ✅ Tự động trả về { data, meta }
-//   },
-
-//   // 📄 Lấy 1 tin theo id
-//   async findOne(ctx) {
-//     const { id } = ctx.params;
-
-//     const entry = await strapi.entityService.findOne("api::new.new", id, {
-//       populate: {
-//         category: true,
-//         image: true,
-//       },
-//     });
-
-//     if (!entry) {
-//       return ctx.notFound("Tin không tồn tại");
-//     }
-
-//     return { data: entry };
-//   },
-// }));
