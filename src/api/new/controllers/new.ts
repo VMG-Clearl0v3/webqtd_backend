@@ -1,37 +1,75 @@
 import { factories } from "@strapi/strapi";
 
 export default factories.createCoreController("api::new.new", ({ strapi }) => ({
-  // 📄 Lấy danh sách tin tức (có category + image + meta pagination)
   async find(ctx) {
     const { query } = ctx;
 
-    const result = await strapi.entityService.findPage("api::new.new", {
-      ...query,
-      populate: {
-        category: {
-          fields: ["id", "name", "slug", "description"], // chọn field cần lấy
+    try {
+      const result = await strapi.entityService.findPage("api::new.new", {
+        ...query,
+        populate: {
+          category: { fields: ["id", "name", "slug"] },
+          image: true,
         },
-        image: true, // lấy toàn bộ thông tin media
-      },
-      sort: { date: "desc" },
-    });
+        sort: { date: "desc" },
+      });
 
-    return result; // ✅ trả { data, meta } đầy đủ
+      // result: PaginatedResult
+      const data = result.results; // ✅ đúng key
+      const meta = { pagination: result.pagination };
+
+      ctx.body = { data, meta }; // ✅ trả chuẩn Strapi
+    } catch (error: any) {
+      ctx.status = 500;
+      ctx.body = { error: error.message };
+    }
   },
 
-  // 📄 Lấy 1 bài cụ thể (có category + image)
   async findOne(ctx) {
-    const { id } = ctx.params;
-
-    const entity = await strapi.entityService.findOne("api::new.new", id, {
-      populate: {
-        category: {
-          fields: ["id", "name", "slug", "description"],
+    try {
+      const { id } = ctx.params;
+      const entity = await strapi.entityService.findOne("api::new.new", id, {
+        populate: {
+          category: { fields: ["id", "name", "slug", "description"] },
+          image: true,
         },
-        image: true,
-      },
-    });
+      });
 
-    return { data: entity };
+      ctx.body = { data: entity };
+    } catch (error: any) {
+      ctx.status = 500;
+      ctx.body = { error: error.message };
+    }
   },
 }));
+// import { factories } from '@strapi/strapi';
+
+// export default factories.createCoreController('api::new.new', ({ strapi }) => ({
+//   async find(ctx) {
+//     // ⚙️ Bổ sung populate, vẫn dùng controller gốc để giữ pagination
+//     ctx.query = {
+//       ...ctx.query,
+//       populate: {
+//         category: true,
+//         image: true,
+//       },
+//       sort: { date: 'desc' },
+//     };
+
+//     const { data, meta } = await super.find(ctx);
+//     return { data, meta };
+//   },
+
+//   async findOne(ctx) {
+//     ctx.query = {
+//       ...ctx.query,
+//       populate: {
+//         category: true,
+//         image: true,
+//       },
+//     };
+
+//     const { data } = await super.findOne(ctx);
+//     return { data };
+//   },
+// }));
